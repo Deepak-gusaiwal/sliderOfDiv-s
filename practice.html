@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>practice of Slider</title>
+</head>
+<style>
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background-color: rgba(255, 60, 60, 0.795);
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .mainContainer {
+        height: 95vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .slidesContainer {
+        width: 100%;
+        margin: 0 auto;
+        display: flex;
+        position: relative;
+        height: 85%;
+        transition: 500ms;
+    }
+
+    .slide {
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        top: 0;
+
+    }
+
+    .content {
+        font-size: 5rem;
+        font-weight: 900;
+        position: absolute;
+        /* inset: 0; */
+        width: 100%;
+        height: fit-content;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: flex-end;
+        z-index: 1;
+        color: white;
+        overflow: hidden;
+        -webkit-background-clip: text;
+        background-image: url(./gifs/fire.txt);
+        filter: contrast(300%);
+        color: transparent;
+        text-transform: capitalize;
+    }
+
+ 
+
+    .prev,
+    .next {
+        position: absolute;
+        top: 40%;
+        font-size: 2rem;
+        border: none;
+        padding: 1rem;
+        background-color: transparent;
+        border: 2px solid rgba(251, 0, 0, 0.151);
+        border-radius: 0.7rem;
+        color: rgba(255, 255, 255, 0.445);
+        transition: 200ms;
+        cursor: pointer;
+        z-index: 2;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .prev:hover,
+    .next:hover,
+    .prev:focus,
+    .next:focus {
+        background-color: rgba(251, 0, 0, 0.37);
+        color: white;
+
+    }
+
+    .next {
+        right: 1rem;
+    }
+
+    .prev {
+        left: 1rem;
+    }
+
+    .dotsContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 0;
+        gap: 3rem;
+    }
+
+    .dotsContainer button {
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+        border: none;
+        background-color: rgba(0, 0, 0, 0.342);
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+
+        cursor: pointer;
+        transition: 200ms;
+    }
+
+    .dotsContainer button:hover {
+        transform: scale(3);
+    }
+
+    .dotsContainer button.active {
+        border: 2px solid red;
+        transform: scale(1.5);
+    }
+</style>
+
+<body>
+    <div class="mainContainer">
+        <button class="prev">&lt;</button>
+        <button class="next">&gt;</button>
+        <div class="slidesContainer">
+            <div class="slide active">
+                <img src="./gifs/rengoku3.gif" alt="">
+                <div class="content">
+                    rengoku
+                </div>
+            </div>
+            <div class="slide">
+                <img src="./gifs/rengoku 2.gif" alt="">
+                <div class="content">
+                    Rengoku
+                </div>
+            </div>
+            <div class="slide">
+                <img src="./gifs/rengoku.gif" alt="">
+                <div class="content">
+                    Rengoku
+                </div>
+            </div>
+        </div>
+        <div class="dotsContainer">
+            <button class="dot active"></button>
+            <button class="dot"></button>
+            <button class="dot"></button>
+        </div>
+    </div>
+
+    <script>
+        console.log('this is slider');
+
+        //targeting the all required variables/htmlelments here
+        let slidesContainer = document.querySelector('.slidesContainer');
+        let slides = [...slidesContainer.children];
+        let dotsContainer = document.querySelector('.dotsContainer');
+        let dots = [...dotsContainer.children];
+        let nextBtn = document.querySelector('.next');
+        let prevBtn = document.querySelector('.prev');
+
+        // it will give us the exact width of the slide irrespective width the screen size
+        let slideWidth = slides[0].getBoundingClientRect().width;
+
+        // put the slide after one to another
+        // it just put slides after one to another according to their width
+        slides.forEach((slide, index) => {
+            slide.style.left = `${slides[index].getBoundingClientRect().width * index}px`;
+        });
+
+        // function to move the slides
+        // it will actually moveing the slidescontainer through slides respective left/x coordinates
+        function moveSlide(slidesContainer, activeSlide, targetSlide) {
+            slidesContainer.style.transform = `translateX(-${targetSlide.style.left})`
+            activeSlide.classList.remove('active');
+            targetSlide.classList.add('active');
+        }
+
+        // function to Change the activeDots
+        function changeActiveDots(activeDot, targetDot) {
+            activeDot.classList.remove('active');
+            targetDot.classList.add('active');
+        }
+
+        // function to change background image of dots
+        changeBgImgaeOfDots();
+        function changeBgImgaeOfDots() {
+            dots.forEach((dot, index) => {
+                let targetImg = slides[index].firstElementChild.src;
+                dot.style.backgroundImage = `url(${targetImg})`
+            })
+        }
+        // // function to change the background image of next and prev btn
+        // function changeArrowBgImage(btn,requiredSlide){
+        //     let targetImage = requiredSlide.firstElementChild.src;
+        //     btn.style.backgroundImage=`url(${targetImage})`
+        // }
+        // move the slide on click on the nextBtn
+        nextBtn.addEventListener('click', () => {
+            // part-1
+            let activeSlide = slidesContainer.querySelector('.active');
+            let nextSlide = activeSlide.nextElementSibling;
+            if (nextSlide === null) {
+                nextSlide = slidesContainer.firstElementChild;
+            }
+            moveSlide(slidesContainer, activeSlide, nextSlide);
+
+            //part-2
+            let activeDot = dotsContainer.querySelector('.active');
+            let nextDot = activeDot.nextElementSibling;
+            if (nextDot === null) {
+                nextDot = dotsContainer.firstElementChild;
+            }
+            changeActiveDots(activeDot, nextDot);
+        });
+
+        // move the slide on click on the prevBtn
+        prevBtn.addEventListener('click', () => {
+            // part-1 change Slides
+            let activeSlide = slidesContainer.querySelector('.active');
+            let prevSlide = activeSlide.previousElementSibling;
+            if (prevSlide === null) {
+                prevSlide = slidesContainer.lastElementChild;
+            }
+            moveSlide(slidesContainer, activeSlide, prevSlide);
+
+            // part-2 change dots
+            let activeDot = dotsContainer.querySelector('.active');
+            let prevDot = activeDot.previousElementSibling;
+            if (prevDot === null) {
+                prevDot = dotsContainer.lastElementChild;
+            }
+            changeActiveDots(activeDot, prevDot);
+        });
+
+        // move slides on click dots
+        dotsContainer.addEventListener('click', (e) => {
+            let targetDot = e.target.closest('button');
+
+            //if we click on the dotsContainer other than dots then it will give us null value of targetDot
+            if (targetDot === null) return;
+            //Note:- in function return means Stop the execution from here
+
+            let activeSlide = slidesContainer.querySelector('.active');
+            let dotIndex = dots.findIndex((dot) => { return dot == targetDot });
+
+            let targetSlide = slides[dotIndex];
+            let activeDot = dotsContainer.querySelector('.active');
+
+            moveSlide(slidesContainer, activeSlide, targetSlide);
+            changeActiveDots(activeDot, targetDot);
+        });
+
+    </script>
+</body>
+
+</html>
